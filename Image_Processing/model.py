@@ -116,12 +116,12 @@ class DetectionModel:
                 self.found_defect = True
             
             # Check QR_Code and Serial_Number
-            if class_name == "Qr_code":
+            if class_name == self.categories["qrcode"][0]:
                 x1, y1, x2, y2 = map(int, box.xyxy[0])
                 qr_crop = image[y1:y2, x1:x2]
                 qr_data = self.read_qr_or_datamatrix(qr_crop)
                 # continue
-            elif class_name == "Serial_Number":
+            elif class_name ==  self.categories["sn"][0]:
                 x1, y1, x2, y2 = map(int, box.xyxy[0])      
                 serial_crop = image[y1:y2, x1:x2]
                 serial_data = self.read_serial_number(serial_crop)
@@ -129,7 +129,7 @@ class DetectionModel:
                 # continue
 
             x1, y1, x2, y2 = map(int, box.xyxy[0])
-            color = (0, 0, 255) if class_name in {"Scratch", "Text_Scratch", "Qr_Code_Scratch"} else (0, 255, 0)
+            color = (0, 0, 255) if class_name in self.categories["defect"] else (0, 255, 0)
             cv2.rectangle(image, (x1, y1), (x2, y2), color, 2)
             # label = f"{class_name} {conf:.2f}"
             label = f"{class_name}"

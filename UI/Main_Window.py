@@ -1,9 +1,10 @@
 import os
 os.environ["OMP_NUM_THREADS"] = "1"
+from datetime import datetime
 import numpy as np
 from PySide6.QtWidgets import QMainWindow, QMessageBox, QFileDialog
 from PySide6.QtGui import QPixmap, QImage
-from PySide6.QtCore import Qt, QTimer
+from PySide6.QtCore import Qt, QSettings
 from UI.Home import Ui_MainWindow  # Import your generated class
 from Camera_Module.MvCameraControl_class import cast, POINTER, MvCamera, MV_CC_DEVICE_INFO_LIST,MV_CC_DEVICE_INFO, MV_GIGE_DEVICE, MV_USB_DEVICE
 from Camera_Module.MvErrorDefine_const import *
@@ -24,7 +25,6 @@ class MainWindow(QMainWindow):
         self.obj_cam_operation = 0
         
         self.image_arr = None
-        self.image = None
         self.isOpen = False
         self.isGrabbing = False
 
@@ -36,10 +36,54 @@ class MainWindow(QMainWindow):
         self.ui.bnStop.clicked.connect(self.stop_camera)
         self.ui.bnSet.clicked.connect(self.save_settings)
         self.ui.bnFolder.clicked.connect(self.choose_folder)
-        # Create output directory if it doesn't exist
-        self.output_dir = "image_captured"
-        self.output_dir_ori = "image_captured_ori"
+        
+        self.load_initial_settings()
         self.enable_controls() 
+
+    def load_initial_settings(self):
+        # Load settings from config.ini
+        self.settings = QSettings("config.ini", QSettings.IniFormat)
+        base_output_dir = self.settings.value("Paths/output_dir")
+
+        if not base_output_dir:
+            self.ui.dir.setText("No base folder selected in settings")
+            return
+
+        self._initialize_output_directories(base_output_dir)
+
+    def choose_folder(self):
+        folder = QFileDialog.getExistingDirectory(self, "Select Folder")
+        if not folder:
+            self.ui.dir.setText("No folder selected")
+            return
+
+        # Store selected folder as base output directory
+        self.settings.setValue("Paths/output_dir", folder)
+        self._initialize_output_directories(folder)
+    
+    def _initialize_output_directories(self, base_output_dir):
+        """Create date-based OK/NG folder structure under the given base path."""
+        today = datetime.now().strftime("%Y-%m-%d")
+        self.output_dir = os.path.join(base_output_dir, today)
+        os.makedirs(self.output_dir, exist_ok=True)
+
+        # Define subfolder structure
+        subfolders = {
+            "output_dir_ok_raw": os.path.join(self.output_dir, "OK", "raw_image"),
+            "output_dir_ok_annotated": os.path.join(self.output_dir, "OK", "annotated_image"),
+            "output_dir_ok_label": os.path.join(self.output_dir, "OK", "label"),
+            "output_dir_ng_raw": os.path.join(self.output_dir, "NG", "raw_image"),
+            "output_dir_ng_annotated": os.path.join(self.output_dir, "NG", "annotated_image"),
+            "output_dir_ng_label": os.path.join(self.output_dir, "NG", "label"),
+        }
+
+        # Create folders and store paths in self
+        for attr, path in subfolders.items():
+            os.makedirs(path, exist_ok=True)
+            setattr(self, attr, path)
+
+        # Update UI
+        self.ui.dir.setText(base_output_dir)
 
     ## Connect Camera
     def enum_devices(self):
@@ -94,8 +138,7 @@ class MainWindow(QMainWindow):
 
     def set_external_trigger_mode(self):
         if not self.isOpen or not self.obj_cam_operation:
-            return False
-            
+            return False    
         ret = self.obj_cam_operation.Set_trigger_external(trigger_source=0, trigger_activation=0, trigger_delay_us=0)
         # breakpoint()
         if ret != 0:
@@ -117,17 +160,14 @@ class MainWindow(QMainWindow):
     def save_settings(self):
         if not self.isOpen or not self.obj_cam_operation:
             QMessageBox.warning(self, "Error", "Camera not open", QMessageBox.StandardButton.Ok)
-            return MV_E_CALLORDER
-            
+            return MV_E_CALLORDER   
         frame_rate = self.ui.edtFrameRate.text()
         exposure = self.ui.edtExposureTime.text()
         gain = self.ui.edtGain.text()
-
         if is_float(frame_rate)!=True or is_float(exposure)!=True or is_float(gain)!=True:
             strError = "Set param failed ret:" + ToHexStr(MV_E_PARAMETER)
             QMessageBox.warning(self, "Error", strError, QMessageBox.StandardButton.Ok)
             return MV_E_PARAMETER
-
         ret = self.obj_cam_operation.Set_parameter(frame_rate, exposure, gain)
         if ret != MV_OK:
             strError = "Set param failed ret:" + ToHexStr(ret)
@@ -156,8 +196,6 @@ class MainWindow(QMainWindow):
         else:
             self.get_param()
             self.isOpen = True
-            # self.set_software_trigger_mode_on()
-            # self.set_external_trigger_mode()
             self.enable_controls()
             
 
@@ -214,10 +252,8 @@ class MainWindow(QMainWindow):
         if np_arr is None or np_arr.size == 0:
             print("Error: Empty image array received")
             return
-            
         if np_arr.dtype != np.uint8:
             raise ValueError("The input NumPy array must be of type uint8")
-            
         if len(np_arr.shape) == 2:  # If the image is grayscale (1 channel)
             height, width = np_arr.shape
             channels = 1
@@ -242,7 +278,7 @@ class MainWindow(QMainWindow):
     def stop_camera(self):
         if not self.isGrabbing:
             return
-            
+
         # Disconnect signal first to prevent callbacks during stop
         try:
             self.obj_cam_operation.image_signal.disconnect()
@@ -254,7 +290,6 @@ class MainWindow(QMainWindow):
             strError = "Stop grabbing failed " + ToHexStr(ret)
             QMessageBox.warning(self, "Error", strError, QMessageBox.Ok)
             return
-            
         self.isGrabbing = False
         self.enable_controls()
     
@@ -274,17 +309,6 @@ class MainWindow(QMainWindow):
         # elif crop_img.shape[2] == 1:  # Single-channel image (H, W, 1)
         #     crop_img = cv2.cvtColor(crop_img, cv2.COLOR_GRAY2BGR)
   
-    def choose_folder(self):
-        folder = QFileDialog.getExistingDirectory(self, "Select Folder")
-        self.output_dir = folder
-        self.output_dir_ori = os.path.join(folder, "raw_images")
-        # Create the ori folder if it doesn't exist
-        os.makedirs(self.output_dir_ori, exist_ok=True)
-        if folder:
-            self.ui.dir.setText(f"Selected folder: {folder}")
-        else:
-            self.ui.dir.setText("No folder selected")
-    
     def check_quality(self, found_error, found_qr_code, found_serial_number, position_fail):
         if (found_error or position_fail) or not (found_qr_code and found_serial_number):
             self.ui.label_check.setText("NG")

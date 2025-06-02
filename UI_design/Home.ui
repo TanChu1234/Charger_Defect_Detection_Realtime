@@ -75,9 +75,9 @@
    <widget class="QTabWidget" name="tabWidget">
     <property name="geometry">
      <rect>
-      <x>10</x>
+      <x>9</x>
       <y>10</y>
-      <width>1900</width>
+      <width>1901</width>
       <height>991</height>
      </rect>
     </property>
@@ -196,10 +196,10 @@ QMessageBox {
      <widget class="QLabel" name="label_img_out">
       <property name="geometry">
        <rect>
-        <x>20</x>
+        <x>10</x>
         <y>20</y>
-        <width>1231</width>
-        <height>920</height>
+        <width>1241</width>
+        <height>931</height>
        </rect>
       </property>
       <property name="styleSheet">
@@ -246,7 +246,7 @@ color: rgb(255, 0, 0);</string>
         <x>1260</x>
         <y>20</y>
         <width>631</width>
-        <height>921</height>
+        <height>931</height>
        </rect>
       </property>
       <property name="styleSheet">
@@ -258,7 +258,7 @@ color: rgb(255, 0, 0);</string>
          <x>30</x>
          <y>720</y>
          <width>571</width>
-         <height>201</height>
+         <height>211</height>
         </rect>
        </property>
        <property name="font">
@@ -583,7 +583,7 @@ border:none;
        <property name="geometry">
         <rect>
          <x>60</x>
-         <y>120</y>
+         <y>110</y>
          <width>521</width>
          <height>41</height>
         </rect>
@@ -750,7 +750,7 @@ border-radius: 0px;</string>
        </property>
        <property name="geometry">
         <rect>
-         <x>190</x>
+         <x>100</x>
          <y>240</y>
          <width>121</width>
          <height>41</height>
@@ -778,7 +778,7 @@ border-radius: 0px;</string>
        </property>
        <property name="geometry">
         <rect>
-         <x>330</x>
+         <x>260</x>
          <y>240</y>
          <width>121</width>
          <height>41</height>
@@ -862,16 +862,16 @@ border-radius: 0px;</string>
        </property>
        <property name="geometry">
         <rect>
-         <x>430</x>
-         <y>300</y>
-         <width>111</width>
-         <height>31</height>
+         <x>410</x>
+         <y>240</y>
+         <width>131</width>
+         <height>41</height>
         </rect>
        </property>
        <property name="font">
         <font>
-         <pointsize>11</pointsize>
-         <bold>false</bold>
+         <pointsize>12</pointsize>
+         <bold>true</bold>
         </font>
        </property>
        <property name="focusPolicy">
@@ -887,10 +887,10 @@ border-radius: 0px;</string>
       <widget class="QLabel" name="dir">
        <property name="geometry">
         <rect>
-         <x>100</x>
+         <x>70</x>
          <y>300</y>
-         <width>311</width>
-         <height>31</height>
+         <width>511</width>
+         <height>41</height>
         </rect>
        </property>
        <property name="font">
@@ -902,7 +902,7 @@ border-radius: 0px;</string>
        <property name="styleSheet">
         <string notr="true">color: rgb(0, 0, 0);
 background-color: none;
-border-radius: 0px;</string>
+border-radius: 5px;</string>
        </property>
        <property name="text">
         <string/>

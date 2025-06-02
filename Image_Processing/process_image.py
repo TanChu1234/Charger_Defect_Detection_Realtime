@@ -146,7 +146,7 @@ class ImageFunction:
     def save(image, annotated_img, output_dir, output_dir_ori):
         for dir_path in [output_dir, output_dir_ori]:
             if not os.path.exists(dir_path):
-                os.makedirs(dir_path)
+                return False
         timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
         output_path = os.path.join(output_dir, f"result_{timestamp}.jpg")
         original_path = os.path.join(output_dir_ori, f"result_{timestamp}.jpg")
@@ -154,4 +154,4 @@ class ImageFunction:
         cv2.imwrite(output_path, annotated_img)
         cv2.imwrite(original_path, image)
         
-        return
+        return True
