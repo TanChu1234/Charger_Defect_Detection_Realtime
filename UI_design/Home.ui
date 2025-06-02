@@ -1,0 +1,930 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>MainWindow</class>
+ <widget class="QMainWindow" name="MainWindow">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>1920</width>
+    <height>1080</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>MainWindow</string>
+  </property>
+  <property name="styleSheet">
+   <string notr="true">QMainWindow {
+                background-color: rgb(255, 255, 255); /* Dark background for the main window */
+            }
+
+            QLabel, QPushButton, QTextEdit {
+                color: #ffffff; /* White text for readability */
+                background-color: #333333; /* Slightly lighter dark gray for widgets */
+                border: 1px solid #444444;
+                padding: 5px;
+                border-radius: 4px;
+            }
+			
+            QTabWidget::pane { /* The tab widget frame */
+                border-top: 2px solid #333333;
+            }
+
+            QTabBar::tab {
+                background: #2b2b2b;
+                color: #ccc;
+                border: 2px solid #333333;
+                border-bottom-color: #333333; /* same as the pane color */
+                border-top-left-radius: 4px;
+                border-top-right-radius: 4px;
+                min-width: 8ex;
+                padding: 5px;
+            }
+
+            QTabBar::tab:selected, QTabBar::tab:hover {
+                background: #3c3c3c;
+                color: #ffffff;
+                border-color: #0057b7; /* Blue border for selected/hover */
+            }
+
+            QTabBar::tab:selected {
+                border-color: #333333;
+                border-bottom-color: #3c3c3c; /* same as pane color */
+            }
+
+            QPushButton:hover {
+                background-color: #505050;
+                border: 3px solid #0066cc;; /* Blue border for button hover */
+            }
+
+     		QMessageBox {
+        			background-color: #ffffff; /* White background for the message box */
+        			color: rgb(255, 255, 255); /* Black text for general content */
+    			}
+    		QMessageBox QPushButton {
+        			background-color: #8c8c8c;
+        			border: none;
+       			}
+    		QMessageBox QLabel {
+        			background-color: #ffffff; /* White background for the message box */
+        			color: rgb(0, 0, 0); /* Explicitly setting label text color to black */
+        			border: none;
+    			}</string>
+  </property>
+  <widget class="QWidget" name="centralWidget">
+   <widget class="QTabWidget" name="tabWidget">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>10</y>
+      <width>1900</width>
+      <height>991</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <pointsize>12</pointsize>
+     </font>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">            QMainWindow {
+                background-color: #333333; /* Dark background for the main window */
+            }
+
+            QPushButton, QTextEdit {
+                color: black; /* White text for readability */
+                background-color: #e7e7e7; /* Slightly lighter dark gray for widgets */
+                border: 1px solid #444444;
+                padding: 5px;
+                border-radius: 4px;
+            }
+			
+            QTabWidget::pane { /* The tab widget frame */
+                border-top: 2px solid #f3f3f3;
+            }
+            QTabBar::tab {
+                background: #f3f3f3;
+                color: rgb(0, 0, 0);
+                border: 1px;
+                min-width: 8ex;
+                padding: 5px;
+            }
+
+            QTabBar::tab:selected, QTabBar::tab:hover {
+				background: #e7e7e7;
+				border-top: 3px solid #0f52ba;
+            }
+
+
+            QPushButton:hover {
+ 				 background-color: rgb(60, 170, 255);
+                border: 1px solid #0066cc;; /* Blue border for button hover */
+            }
+
+QScrollBar:vertical {
+                background: #2e2e2e;
+                width: 14px;
+                margin: 15px 3px 15px 3px;
+                border: 1px solid #222222;
+                border-radius: 5px;
+            }
+
+QScrollBar::handle:vertical {
+                background: #5c90d2;
+                min-height: 20px;
+                border-radius: 5px;
+            }
+
+QScrollBar::handle:vertical:hover {
+                background: #787878;
+            }
+QScrollBar::add-line:vertical, QScrollBar::sub-line:vertical {
+                background: none;
+            }
+QScrollBar::add-page:vertical, QScrollBar::sub-page:vertical {
+                background: none;
+            }
+
+ 			QRadioButton {
+    			color: #b1b1b1; /* Default text color */
+    			spacing: 5px; /* Spacing around text and icon */
+			}
+			QRadioButton::indicator {
+    			width: 13px;
+    			height: 13px;
+    			border-radius: 7px; /* Circular indicators */
+			}
+			QRadioButton::indicator:unchecked {
+    			background-color: #cae1ff; /* Light gray background when unchecked */
+   			 	border: 1px solid #0066cc; /* Gray border */
+			}
+			QRadioButton::indicator:checked {
+    			background-color: #5c90d2; /* Blue background when checked */
+    			border: 1px solid #0066cc; /* Darker blue border */
+			}
+
+			QRadioButton::indicator:hover {
+    			background-color: #5c90d2; /* Darker grey background when checked */
+                border: 2px solid #0066cc; /* White border when checked */
+			}
+			QRadioButton::indicator:checked:hover {
+    			background-color: #5c90d2; /* Darker grey background when checked */
+                border: 1px solid #0066cc; /* White border when checked */
+			}
+QMessageBox {
+        			background-color: #ffffff; /* White background for the message box */
+        			color: rgb(255, 255, 255); /* Black text for general content */
+    			}
+    		QMessageBox QPushButton {
+        			background-color: #8c8c8c;
+        			border: none;
+       			}
+    		QMessageBox QLabel {
+        			background-color: #ffffff; /* White background for the message box */
+        			color: rgb(0, 0, 0); /* Explicitly setting label text color to black */
+        			border: none;
+    			}
+</string>
+    </property>
+    <property name="currentIndex">
+     <number>0</number>
+    </property>
+    <widget class="QWidget" name="tab_Onl">
+     <attribute name="title">
+      <string>Process Image</string>
+     </attribute>
+     <widget class="QLabel" name="label_img_out">
+      <property name="geometry">
+       <rect>
+        <x>20</x>
+        <y>20</y>
+        <width>1231</width>
+        <height>920</height>
+       </rect>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">border-radius: 0px;
+border: 1px solid rgb(0, 0, 0);
+background-color:  rgb(0, 0, 127);</string>
+      </property>
+      <property name="text">
+       <string/>
+      </property>
+      <property name="alignment">
+       <set>Qt::AlignCenter</set>
+      </property>
+     </widget>
+     <widget class="QLabel" name="label_Roi">
+      <property name="geometry">
+       <rect>
+        <x>940</x>
+        <y>100</y>
+        <width>281</width>
+        <height>31</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <pointsize>11</pointsize>
+       </font>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">background-color: none;
+border:none;
+color: rgb(255, 0, 0);</string>
+      </property>
+      <property name="text">
+       <string/>
+      </property>
+      <property name="alignment">
+       <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+      </property>
+     </widget>
+     <widget class="QWidget" name="widget" native="true">
+      <property name="geometry">
+       <rect>
+        <x>1260</x>
+        <y>20</y>
+        <width>631</width>
+        <height>921</height>
+       </rect>
+      </property>
+      <property name="styleSheet">
+       <string notr="true"/>
+      </property>
+      <widget class="QLabel" name="label_check">
+       <property name="geometry">
+        <rect>
+         <x>30</x>
+         <y>720</y>
+         <width>571</width>
+         <height>201</height>
+        </rect>
+       </property>
+       <property name="font">
+        <font>
+         <pointsize>48</pointsize>
+         <bold>true</bold>
+         <kerning>true</kerning>
+        </font>
+       </property>
+       <property name="styleSheet">
+        <string notr="true">color: rgb(0, 0, 0);
+border: 1px solid rgb(0, 0, 0);
+background-color: rgb(85, 170, 0);
+border-radius: 0px;</string>
+       </property>
+       <property name="text">
+        <string>OK</string>
+       </property>
+       <property name="alignment">
+        <set>Qt::AlignHCenter|Qt::AlignTop</set>
+       </property>
+       <property name="margin">
+        <number>0</number>
+       </property>
+       <property name="indent">
+        <number>60</number>
+       </property>
+      </widget>
+      <widget class="QLabel" name="label_6">
+       <property name="geometry">
+        <rect>
+         <x>30</x>
+         <y>720</y>
+         <width>571</width>
+         <height>61</height>
+        </rect>
+       </property>
+       <property name="font">
+        <font>
+         <pointsize>28</pointsize>
+         <bold>true</bold>
+        </font>
+       </property>
+       <property name="styleSheet">
+        <string notr="true">color: rgb(0, 0, 0);
+border: 1px solid rgb(0, 0, 0);
+background-color: none;
+border-radius: 0px;</string>
+       </property>
+       <property name="text">
+        <string>RESULT</string>
+       </property>
+       <property name="alignment">
+        <set>Qt::AlignCenter</set>
+       </property>
+      </widget>
+      <widget class="QLabel" name="label_2">
+       <property name="geometry">
+        <rect>
+         <x>330</x>
+         <y>10</y>
+         <width>291</width>
+         <height>91</height>
+        </rect>
+       </property>
+       <property name="font">
+        <font>
+         <pointsize>28</pointsize>
+         <bold>true</bold>
+        </font>
+       </property>
+       <property name="styleSheet">
+        <string notr="true">color: none;
+background-color: rgb(255, 255, 255);
+border:none;</string>
+       </property>
+       <property name="text">
+        <string>VISION SYSTEM</string>
+       </property>
+       <property name="alignment">
+        <set>Qt::AlignCenter</set>
+       </property>
+      </widget>
+      <widget class="QLabel" name="label_logo">
+       <property name="geometry">
+        <rect>
+         <x>10</x>
+         <y>0</y>
+         <width>321</width>
+         <height>111</height>
+        </rect>
+       </property>
+       <property name="styleSheet">
+        <string notr="true">background-color: none;
+border:none</string>
+       </property>
+       <property name="text">
+        <string/>
+       </property>
+       <property name="pixmap">
+        <pixmap>image/logo.png</pixmap>
+       </property>
+      </widget>
+      <widget class="QLabel" name="label_time">
+       <property name="geometry">
+        <rect>
+         <x>130</x>
+         <y>850</y>
+         <width>401</width>
+         <height>41</height>
+        </rect>
+       </property>
+       <property name="font">
+        <font>
+         <pointsize>16</pointsize>
+         <bold>true</bold>
+        </font>
+       </property>
+       <property name="styleSheet">
+        <string notr="true">border: none;
+background-color:none;
+color: rgb(0, 0, 0);</string>
+       </property>
+       <property name="text">
+        <string>0 ms</string>
+       </property>
+       <property name="alignment">
+        <set>Qt::AlignCenter</set>
+       </property>
+      </widget>
+      <widget class="QGroupBox" name="groupBox">
+       <property name="geometry">
+        <rect>
+         <x>110</x>
+         <y>360</y>
+         <width>421</width>
+         <height>211</height>
+        </rect>
+       </property>
+       <property name="styleSheet">
+        <string notr="true">
+				border: 1px solid rgb(0, 0, 0);
+</string>
+       </property>
+       <property name="title">
+        <string/>
+       </property>
+       <widget class="QLineEdit" name="edtFrameRate">
+        <property name="geometry">
+         <rect>
+          <x>210</x>
+          <y>110</y>
+          <width>121</width>
+          <height>31</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string>0</string>
+        </property>
+       </widget>
+       <widget class="QLabel" name="label">
+        <property name="geometry">
+         <rect>
+          <x>100</x>
+          <y>110</y>
+          <width>91</width>
+          <height>31</height>
+         </rect>
+        </property>
+        <property name="styleSheet">
+         <string notr="true">background-color: none;
+color: rgb(0, 0, 0);
+border:none;
+</string>
+        </property>
+        <property name="text">
+         <string>Frame Rate:</string>
+        </property>
+       </widget>
+       <widget class="QLabel" name="label_3">
+        <property name="geometry">
+         <rect>
+          <x>100</x>
+          <y>10</y>
+          <width>101</width>
+          <height>31</height>
+         </rect>
+        </property>
+        <property name="font">
+         <font>
+          <pointsize>10</pointsize>
+         </font>
+        </property>
+        <property name="styleSheet">
+         <string notr="true">background-color: none;
+color: rgb(0, 0, 0);
+border:none;
+</string>
+        </property>
+        <property name="text">
+         <string>Exposure Time:</string>
+        </property>
+       </widget>
+       <widget class="QLineEdit" name="edtExposureTime">
+        <property name="geometry">
+         <rect>
+          <x>210</x>
+          <y>10</y>
+          <width>121</width>
+          <height>31</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string>0</string>
+        </property>
+       </widget>
+       <widget class="QLabel" name="label_4">
+        <property name="geometry">
+         <rect>
+          <x>100</x>
+          <y>60</y>
+          <width>91</width>
+          <height>31</height>
+         </rect>
+        </property>
+        <property name="font">
+         <font>
+          <pointsize>10</pointsize>
+         </font>
+        </property>
+        <property name="styleSheet">
+         <string notr="true">background-color: none;
+color: rgb(0, 0, 0);
+border:none;
+</string>
+        </property>
+        <property name="text">
+         <string>Gain:</string>
+        </property>
+       </widget>
+       <widget class="QLineEdit" name="edtGain">
+        <property name="geometry">
+         <rect>
+          <x>210</x>
+          <y>60</y>
+          <width>121</width>
+          <height>31</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string>0</string>
+        </property>
+       </widget>
+       <widget class="QPushButton" name="bnSet">
+        <property name="enabled">
+         <bool>true</bool>
+        </property>
+        <property name="geometry">
+         <rect>
+          <x>160</x>
+          <y>160</y>
+          <width>131</width>
+          <height>41</height>
+         </rect>
+        </property>
+        <property name="font">
+         <font>
+          <pointsize>12</pointsize>
+          <bold>true</bold>
+         </font>
+        </property>
+        <property name="focusPolicy">
+         <enum>Qt::ClickFocus</enum>
+        </property>
+        <property name="styleSheet">
+         <string notr="true"/>
+        </property>
+        <property name="text">
+         <string>Set Parameter</string>
+        </property>
+       </widget>
+      </widget>
+      <widget class="QPushButton" name="bnEnum">
+       <property name="geometry">
+        <rect>
+         <x>100</x>
+         <y>180</y>
+         <width>121</width>
+         <height>41</height>
+        </rect>
+       </property>
+       <property name="font">
+        <font>
+         <pointsize>12</pointsize>
+         <bold>true</bold>
+        </font>
+       </property>
+       <property name="text">
+        <string>Search Device</string>
+       </property>
+      </widget>
+      <widget class="QPushButton" name="bnOpen">
+       <property name="geometry">
+        <rect>
+         <x>260</x>
+         <y>180</y>
+         <width>121</width>
+         <height>41</height>
+        </rect>
+       </property>
+       <property name="font">
+        <font>
+         <pointsize>12</pointsize>
+         <bold>true</bold>
+        </font>
+       </property>
+       <property name="text">
+        <string>Open Device</string>
+       </property>
+      </widget>
+      <widget class="QComboBox" name="ComboDevices">
+       <property name="geometry">
+        <rect>
+         <x>60</x>
+         <y>120</y>
+         <width>521</width>
+         <height>41</height>
+        </rect>
+       </property>
+       <property name="font">
+        <font>
+         <pointsize>12</pointsize>
+         <bold>true</bold>
+        </font>
+       </property>
+       <property name="styleSheet">
+        <string notr="true"/>
+       </property>
+       <property name="frame">
+        <bool>true</bool>
+       </property>
+      </widget>
+      <widget class="QPushButton" name="bnClose">
+       <property name="enabled">
+        <bool>true</bool>
+       </property>
+       <property name="geometry">
+        <rect>
+         <x>410</x>
+         <y>180</y>
+         <width>131</width>
+         <height>41</height>
+        </rect>
+       </property>
+       <property name="font">
+        <font>
+         <pointsize>12</pointsize>
+         <bold>true</bold>
+        </font>
+       </property>
+       <property name="focusPolicy">
+        <enum>Qt::ClickFocus</enum>
+       </property>
+       <property name="styleSheet">
+        <string notr="true"/>
+       </property>
+       <property name="text">
+        <string>Close Device</string>
+       </property>
+      </widget>
+      <widget class="QLabel" name="label_7">
+       <property name="geometry">
+        <rect>
+         <x>30</x>
+         <y>630</y>
+         <width>121</width>
+         <height>31</height>
+        </rect>
+       </property>
+       <property name="font">
+        <font>
+         <pointsize>12</pointsize>
+         <bold>true</bold>
+        </font>
+       </property>
+       <property name="styleSheet">
+        <string notr="true">color: rgb(0, 0, 0);
+border: none;
+background-color: none;
+border-radius: 0px;</string>
+       </property>
+       <property name="text">
+        <string>QR Code:</string>
+       </property>
+       <property name="alignment">
+        <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+       </property>
+      </widget>
+      <widget class="QLabel" name="label_8">
+       <property name="geometry">
+        <rect>
+         <x>30</x>
+         <y>670</y>
+         <width>161</width>
+         <height>31</height>
+        </rect>
+       </property>
+       <property name="font">
+        <font>
+         <pointsize>12</pointsize>
+         <bold>true</bold>
+        </font>
+       </property>
+       <property name="layoutDirection">
+        <enum>Qt::LeftToRight</enum>
+       </property>
+       <property name="styleSheet">
+        <string notr="true">color: rgb(0, 0, 0);
+border: none;
+background-color: none;
+border-radius: 0px;</string>
+       </property>
+       <property name="text">
+        <string>Serial Number:</string>
+       </property>
+       <property name="alignment">
+        <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+       </property>
+      </widget>
+      <widget class="QLabel" name="qr_code">
+       <property name="geometry">
+        <rect>
+         <x>110</x>
+         <y>630</y>
+         <width>231</width>
+         <height>31</height>
+        </rect>
+       </property>
+       <property name="font">
+        <font>
+         <pointsize>12</pointsize>
+         <bold>true</bold>
+        </font>
+       </property>
+       <property name="styleSheet">
+        <string notr="true">color: rgb(0, 0, 0);
+border: none;
+background-color: none;
+border-radius: 0px;</string>
+       </property>
+       <property name="text">
+        <string/>
+       </property>
+       <property name="alignment">
+        <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+       </property>
+      </widget>
+      <widget class="QLabel" name="serial">
+       <property name="geometry">
+        <rect>
+         <x>160</x>
+         <y>670</y>
+         <width>371</width>
+         <height>31</height>
+        </rect>
+       </property>
+       <property name="font">
+        <font>
+         <pointsize>12</pointsize>
+         <bold>true</bold>
+        </font>
+       </property>
+       <property name="styleSheet">
+        <string notr="true">color: rgb(0, 0, 0);
+border: none;
+background-color: none;
+border-radius: 0px;</string>
+       </property>
+       <property name="text">
+        <string/>
+       </property>
+       <property name="alignment">
+        <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+       </property>
+      </widget>
+      <widget class="QPushButton" name="bnStart">
+       <property name="enabled">
+        <bool>true</bool>
+       </property>
+       <property name="geometry">
+        <rect>
+         <x>190</x>
+         <y>240</y>
+         <width>121</width>
+         <height>41</height>
+        </rect>
+       </property>
+       <property name="font">
+        <font>
+         <pointsize>12</pointsize>
+         <bold>true</bold>
+        </font>
+       </property>
+       <property name="focusPolicy">
+        <enum>Qt::ClickFocus</enum>
+       </property>
+       <property name="styleSheet">
+        <string notr="true"/>
+       </property>
+       <property name="text">
+        <string>Start Camera</string>
+       </property>
+      </widget>
+      <widget class="QPushButton" name="bnStop">
+       <property name="enabled">
+        <bool>true</bool>
+       </property>
+       <property name="geometry">
+        <rect>
+         <x>330</x>
+         <y>240</y>
+         <width>121</width>
+         <height>41</height>
+        </rect>
+       </property>
+       <property name="font">
+        <font>
+         <pointsize>12</pointsize>
+         <bold>true</bold>
+        </font>
+       </property>
+       <property name="focusPolicy">
+        <enum>Qt::ClickFocus</enum>
+       </property>
+       <property name="styleSheet">
+        <string notr="true"/>
+       </property>
+       <property name="text">
+        <string>Stop</string>
+       </property>
+      </widget>
+      <widget class="QLabel" name="label_9">
+       <property name="geometry">
+        <rect>
+         <x>30</x>
+         <y>590</y>
+         <width>121</width>
+         <height>31</height>
+        </rect>
+       </property>
+       <property name="font">
+        <font>
+         <pointsize>12</pointsize>
+         <bold>true</bold>
+        </font>
+       </property>
+       <property name="styleSheet">
+        <string notr="true">color: rgb(0, 0, 0);
+border: none;
+background-color: none;
+border-radius: 0px;</string>
+       </property>
+       <property name="text">
+        <string>Position:</string>
+       </property>
+       <property name="alignment">
+        <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+       </property>
+      </widget>
+      <widget class="QLabel" name="position">
+       <property name="geometry">
+        <rect>
+         <x>110</x>
+         <y>590</y>
+         <width>231</width>
+         <height>31</height>
+        </rect>
+       </property>
+       <property name="font">
+        <font>
+         <pointsize>12</pointsize>
+         <bold>true</bold>
+        </font>
+       </property>
+       <property name="styleSheet">
+        <string notr="true">color: rgb(0, 0, 0);
+border: none;
+background-color: none;
+border-radius: 0px;</string>
+       </property>
+       <property name="text">
+        <string/>
+       </property>
+       <property name="alignment">
+        <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+       </property>
+      </widget>
+      <widget class="QPushButton" name="bnFolder">
+       <property name="enabled">
+        <bool>true</bool>
+       </property>
+       <property name="geometry">
+        <rect>
+         <x>430</x>
+         <y>300</y>
+         <width>111</width>
+         <height>31</height>
+        </rect>
+       </property>
+       <property name="font">
+        <font>
+         <pointsize>11</pointsize>
+         <bold>false</bold>
+        </font>
+       </property>
+       <property name="focusPolicy">
+        <enum>Qt::ClickFocus</enum>
+       </property>
+       <property name="styleSheet">
+        <string notr="true"/>
+       </property>
+       <property name="text">
+        <string>Choose Folder</string>
+       </property>
+      </widget>
+      <widget class="QLabel" name="dir">
+       <property name="geometry">
+        <rect>
+         <x>100</x>
+         <y>300</y>
+         <width>311</width>
+         <height>31</height>
+        </rect>
+       </property>
+       <property name="font">
+        <font>
+         <pointsize>12</pointsize>
+         <bold>true</bold>
+        </font>
+       </property>
+       <property name="styleSheet">
+        <string notr="true">color: rgb(0, 0, 0);
+background-color: none;
+border-radius: 0px;</string>
+       </property>
+       <property name="text">
+        <string/>
+       </property>
+       <property name="alignment">
+        <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+       </property>
+      </widget>
+     </widget>
+     <zorder>widget</zorder>
+     <zorder>label_img_out</zorder>
+     <zorder>label_Roi</zorder>
+    </widget>
+    <widget class="QWidget" name="tab_Off">
+     <attribute name="title">
+      <string>Connect Camera</string>
+     </attribute>
+    </widget>
+   </widget>
+  </widget>
+ </widget>
+ <layoutdefault spacing="6" margin="11"/>
+ <resources/>
+ <connections/>
+</ui>
