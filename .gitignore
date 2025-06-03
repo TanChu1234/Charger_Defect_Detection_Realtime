@@ -1,10 +1,10 @@
-# Bỏ qua file ảnh
+# ignore images files
 *.jpg
 *.jpeg
 *.png
 *.bmp
 *.gif
-# Bỏ qua file dữ liệu
+# ignore model files
 *.csv
 *.json
 *.xml
@@ -12,10 +12,10 @@
 *.zip
 *.pt
 *.onnx
-# Bỏ qua thư mục chứa dữ liệu
+# Ignore directories
 Data/
 image/
 weights/
-# Bỏ qua toàn bộ thư mục __pycache__ ở mọi cấp
+# ignore Python cache files
 __pycache__/
 *.py[cod]
