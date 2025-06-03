@@ -80,7 +80,9 @@ class ImageFunction:
         best_rect = ImageFunction.ignore_empty_rows(cropped_img, best_rect, direction='bottom-up')
         cropped_sample = ImageFunction.cropping_img(gray, best_rect)
 
+        # clahe = cv2.createCLAHE(clipLimit=1.0, tileGridSize=(2, 2))
         clahe = cv2.createCLAHE(clipLimit=2.0, tileGridSize=(8, 8))
+        
         cropped_sample = clahe.apply(cropped_sample)
 
         # Ensure 3-channel BGR image

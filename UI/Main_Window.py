@@ -1,6 +1,7 @@
 import os
-os.environ["OMP_NUM_THREADS"] = "1"
 from datetime import datetime
+import time
+import cv2
 import numpy as np
 from PySide6.QtWidgets import QMainWindow, QMessageBox, QFileDialog
 from PySide6.QtGui import QPixmap, QImage
@@ -11,6 +12,7 @@ from Camera_Module.MvErrorDefine_const import *
 from Camera_Module.CamOperation import CameraOperation
 from Camera_Module.utils import decoding_char, ToHexStr, is_float
 from Image_Processing.process_image import ImageFunction
+from Image_Processing.model import DetectionModel, PositionOffset
 
 class MainWindow(QMainWindow):
     def __init__(self):
@@ -21,6 +23,9 @@ class MainWindow(QMainWindow):
 
         self.deviceList = MV_CC_DEVICE_INFO_LIST()
         self.cam = MvCamera()
+        self.image_function = ImageFunction()
+        self.model_detection = DetectionModel()
+        self.model_cls = PositionOffset()
         self.nSelCamIndex = 0
         self.obj_cam_operation = 0
         
@@ -139,7 +144,7 @@ class MainWindow(QMainWindow):
     def set_external_trigger_mode(self):
         if not self.isOpen or not self.obj_cam_operation:
             return False    
-        ret = self.obj_cam_operation.Set_trigger_external(trigger_source=0, trigger_activation=0, trigger_delay_us=0)
+        ret = self.obj_cam_operation.Set_trigger_external(trigger_source=0, trigger_activation=0, trigger_delay_us=2000)
         # breakpoint()
         if ret != 0:
             strError = "Set trigger mode failed " + ToHexStr(ret)
@@ -176,10 +181,9 @@ class MainWindow(QMainWindow):
         return MV_OK
 
     def open_devices(self):
-        if self.isOpen:
-            QMessageBox.warning(self, "Error", 'Camera is Running!', QMessageBox.Ok)
-            return MV_E_CALLORDER
-
+        # if self.isOpen:
+        #     QMessageBox.warning(self, "Error", 'Camera is Running!', QMessageBox.Ok)
+        #     return MV_E_CALLORDER
         nSelCamIndex = self.ui.ComboDevices.currentIndex()
         if nSelCamIndex < 0:
             QMessageBox.warning(self, "Error", 'Please select a camera!', QMessageBox.Ok)
@@ -246,7 +250,7 @@ class MainWindow(QMainWindow):
         self.isGrabbing = True
         self.enable_controls()
         
-        self.obj_cam_operation.image_signal.connect(self.handle_triggered_image)
+        self.obj_cam_operation.image_signal.connect(self.process_with_yolo)
 
     def Display_frame(self, np_arr):
         if np_arr is None or np_arr.size == 0:
@@ -292,27 +296,33 @@ class MainWindow(QMainWindow):
             return
         self.isGrabbing = False
         self.enable_controls()
-    
-    def handle_triggered_image(self, np_arr):
-        # Process the image
-        self.process_with_yolo(np_arr)
 
-    
     def process_with_yolo(self, img_np):
+        start = time.time()
+        self.ui.qr_code.clear()
+        self.ui.serial.clear()
         # Crop and prepare images
-        # crop_img = processing_image(img_np)
-        self.Display_frame(img_np)  # Display the original image
-        print("Hello")
-        # Ensure the cropped image has 3 channels
-        # if len(crop_img.shape) == 2:  # Grayscale image (H, W)
-        #     crop_img = cv2.cvtColor(crop_img, cv2.COLOR_GRAY2BGR)
-        # elif crop_img.shape[2] == 1:  # Single-channel image (H, W, 1)
-        #     crop_img = cv2.cvtColor(crop_img, cv2.COLOR_GRAY2BGR)
-  
-    def check_quality(self, found_error, found_qr_code, found_serial_number, position_fail):
-        if (found_error or position_fail) or not (found_qr_code and found_serial_number):
+        qr_match_sn = False
+        crop_img = ImageFunction.processing_image(img_np)
+        img1, found_deffect, qr, sn = self.model_detection.detection(crop_img)
+        img2, position_fail = self.model_cls.classify(crop_img)
+        if qr == sn:
+            qr_match_sn = True
+        img = cv2.add(img1, img2)
+        self.Display_frame(img)  # Display the original image
+        result = self.check_quality(found_deffect, position_fail, qr_match_sn)
+        stop = time.time()
+        elapsed_ms = (stop - start) * 1000
+        self.ui.label_time.setText(f"{elapsed_ms:.0f} ms")
+        self.ui.qr_code.setText(f"{qr}")
+        self.ui.serial.setText(f"{sn}")
+        
+    def check_quality(self, found_deffect, position_fail, qr_match_sn):
+        if (found_deffect or position_fail) or not (qr_match_sn):
             self.ui.label_check.setText("NG")
             self.ui.label_check.setStyleSheet("background-color: red; color: black;")
+            return False
         else:
             self.ui.label_check.setText("OK")
             self.ui.label_check.setStyleSheet("background-color: green; color: rgb(85, 170, 0);")
+        return True

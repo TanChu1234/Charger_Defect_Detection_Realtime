@@ -1,0 +1,21 @@
+# Bỏ qua file ảnh
+*.jpg
+*.jpeg
+*.png
+*.bmp
+*.gif
+# Bỏ qua file dữ liệu
+*.csv
+*.json
+*.xml
+*.txt
+*.zip
+*.pt
+*.onnx
+# Bỏ qua thư mục chứa dữ liệu
+Data/
+image/
+weights/
+# Bỏ qua toàn bộ thư mục __pycache__ ở mọi cấp
+__pycache__/
+*.py[cod]

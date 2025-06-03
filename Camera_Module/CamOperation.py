@@ -246,6 +246,9 @@ class CameraOperation(QObject):
         """
         if not self.b_open_device:
             return MV_E_CALLORDER
+        ret = self.obj_cam.MV_CC_SetEnumValue("AcquisitionMode", MV_ACQ_MODE_CONTINUOUS)
+        if ret != 0:
+            return ret
         # Set Trigger Mode to On
         ret = self.obj_cam.MV_CC_SetEnumValue("TriggerMode", 1)
         if ret != 0:
@@ -360,7 +363,6 @@ class CameraOperation(QObject):
     
     # 存BMP图像
     def Save_Bmp(self):
-
         if 0 == self.buf_save_image:
             return
 
@@ -402,49 +404,4 @@ class CameraOperation(QObject):
         ret = self.obj_cam.MV_CC_SaveImageToFileEx(stSaveParam)
         self.buf_lock.release()
         return ret
-    
-    def save_mono_image(self):
-        if self.buf_save_image == 0:
-            print("No image buffer available.")
-            return
 
-        self.buf_lock.acquire()
-        try:
-            # Assume you need to convert the buffer from color to Mono8
-            convert_params = MV_CC_PIXEL_CONVERT_PARAM()  # Assuming you have this structure defined
-            convert_params.nWidth = self.st_frame_info.nWidth
-            convert_params.nHeight = self.st_frame_info.nHeight
-            convert_params.enSrcPixelType = self.st_frame_info.enPixelType  # Current pixel type
-            convert_params.pSrcData = self.buf_save_image  # Source buffer
-            convert_params.nSrcDataLen = self.st_frame_info.nFrameLen
-            convert_params.enDstPixelType = PixelType_Gvsp_Mono8  # Destination pixel type
-            convert_params.pDstBuffer = ctypes.cast(ctypes.create_string_buffer(self.st_frame_info.nWidth * self.st_frame_info.nHeight + 2048), POINTER(c_ubyte)) # Assuming frame len is sufficient
-            convert_params.nDstBufferSize = self.st_frame_info.nWidth * self.st_frame_info.nHeight + 2048
-
-            # Perform the conversion
-            ret = self.obj_cam.MV_CC_ConvertPixelType(convert_params)
-            if ret != 0:
-                print(f"Failed to convert image, error code: {ret}")
-                return ret
-
-            file_path = r"D:\Pharma2\new\1.bmp"
-            c_file_path = file_path.encode('ascii')
-
-            stSaveParam = MV_SAVE_IMAGE_TO_FILE_PARAM_EX()
-            stSaveParam.enPixelType = PixelType_Gvsp_Mono8
-            stSaveParam.nWidth = self.st_frame_info.nWidth
-            stSaveParam.nHeight = self.st_frame_info.nHeight
-            stSaveParam.nDataLen = self.st_frame_info.nFrameLen  # Updated to use the size of the converted image
-            stSaveParam.pData = cast(convert_params.pDstBuffer, POINTER(c_ubyte))
-            stSaveParam.enImageType = MV_Image_Bmp
-            stSaveParam.nQuality = 8
-            stSaveParam.pcImagePath = ctypes.create_string_buffer(c_file_path)
-            stSaveParam.iMethodValue = 2
-
-            ret = self.obj_cam.MV_CC_SaveImageToFileEx(stSaveParam)
-            if ret != 0:
-                print(f"Failed to save image, error code: {ret}")
-        finally:
-            self.buf_lock.release()
-
-        return ret
