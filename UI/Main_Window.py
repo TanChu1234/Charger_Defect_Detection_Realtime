@@ -73,7 +73,7 @@ class MainWindow(QMainWindow):
         os.makedirs(self.output_dir, exist_ok=True)
 
         # Define subfolder structure
-        subfolders = {
+        self.subfolders = {
             "output_dir_ok_raw": os.path.join(self.output_dir, "OK", "raw_image"),
             "output_dir_ok_annotated": os.path.join(self.output_dir, "OK", "annotated_image"),
             "output_dir_ok_label": os.path.join(self.output_dir, "OK", "label"),
@@ -83,10 +83,10 @@ class MainWindow(QMainWindow):
         }
 
         # Create folders and store paths in self
-        for attr, path in subfolders.items():
+        for attr, path in self.subfolders.items():
             os.makedirs(path, exist_ok=True)
             setattr(self, attr, path)
-
+        
         # Update UI
         self.ui.dir.setText(base_output_dir)
 
@@ -144,7 +144,7 @@ class MainWindow(QMainWindow):
     def set_external_trigger_mode(self):
         if not self.isOpen or not self.obj_cam_operation:
             return False    
-        ret = self.obj_cam_operation.Set_trigger_external(trigger_source=0, trigger_activation=0, trigger_delay_us=2000)
+        ret = self.obj_cam_operation.Set_trigger_external(trigger_source=0, trigger_activation=0, trigger_delay_us=0)
         # breakpoint()
         if ret != 0:
             strError = "Set trigger mode failed " + ToHexStr(ret)
@@ -251,6 +251,7 @@ class MainWindow(QMainWindow):
         self.enable_controls()
         
         self.obj_cam_operation.image_signal.connect(self.process_with_yolo)
+        time.sleep(0.5)
 
     def Display_frame(self, np_arr):
         if np_arr is None or np_arr.size == 0:
@@ -299,25 +300,51 @@ class MainWindow(QMainWindow):
 
     def process_with_yolo(self, img_np):
         start = time.time()
+        qr = sn = None
+        self.ui.position.clear()
         self.ui.qr_code.clear()
         self.ui.serial.clear()
         # Crop and prepare images
         qr_match_sn = False
         crop_img = ImageFunction.processing_image(img_np)
+        copy_crop_img = crop_img.copy() 
         img1, found_deffect, qr, sn = self.model_detection.detection(crop_img)
-        img2, position_fail = self.model_cls.classify(crop_img)
+        
+        if sn is not None or qr is not None:
+            print(f"QR: {qr}, SN: {sn}")
+            img2, position_fail = self.model_cls.classify(crop_img)
+            img = cv2.add(img1, img2)
+            _ = self.check_quality(found_deffect, qr_match_sn, position_fail)
+            self.ui.position.setText(f"{position_fail} Offset") 
+            self.ui.qr_code.setText(f"{qr}")
+            self.ui.serial.setText(f"{sn}")
+        else:
+            img = img1
+            _ = self.check_defect(found_deffect)
+        
         if qr == sn:
             qr_match_sn = True
-        img = cv2.add(img1, img2)
+                
+        saved_name = f"{datetime.now().strftime("%Y%m%d_%H%M%S")}.bmp"
+        rs_saved_path = f"{self.subfolders['output_dir_ok_annotated']}/{saved_name}"
+        crop_saved_path = f"{self.subfolders['output_dir_ok_raw']}/{saved_name}"
+        
+        print(rs_saved_path)
+        print(crop_saved_path)
+        
+        cv2.imwrite(crop_saved_path, copy_crop_img)
+        cv2.imwrite(rs_saved_path, img)    
+        
         self.Display_frame(img)  # Display the original image
-        result = self.check_quality(found_deffect, position_fail, qr_match_sn)
+        # result = self.check_quality(found_deffect, position_fail, qr_match_sn)
+        
+        # qr = sn = None
         stop = time.time()
         elapsed_ms = (stop - start) * 1000
         self.ui.label_time.setText(f"{elapsed_ms:.0f} ms")
-        self.ui.qr_code.setText(f"{qr}")
-        self.ui.serial.setText(f"{sn}")
         
-    def check_quality(self, found_deffect, position_fail, qr_match_sn):
+        
+    def check_quality(self, found_deffect, qr_match_sn, position_fail=None):
         if (found_deffect or position_fail) or not (qr_match_sn):
             self.ui.label_check.setText("NG")
             self.ui.label_check.setStyleSheet("background-color: red; color: black;")
@@ -325,4 +352,14 @@ class MainWindow(QMainWindow):
         else:
             self.ui.label_check.setText("OK")
             self.ui.label_check.setStyleSheet("background-color: green; color: rgb(85, 170, 0);")
-        return True
+            return True
+        
+    def check_defect(self, found_deffect):
+        if found_deffect:
+            self.ui.label_check.setText("NG")
+            self.ui.label_check.setStyleSheet("background-color: red; color: black;")
+            return False
+        else:
+            self.ui.label_check.setText("OK")
+            self.ui.label_check.setStyleSheet("background-color: green; color: rgb(85, 170, 0);")
+            return True

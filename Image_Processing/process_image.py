@@ -5,14 +5,14 @@ import numpy as np
 
 class ImageFunction:
     @staticmethod
-    def ignore_empty_rows(img, bbox, threshold=240, direction='top-down'):
+    def ignore_empty_rows(img, bbox, threshold=205, direction='top-down'):
         """
         Find the unimportant rows in the image based on the threshold.
 
         Parameters:
             img (np.ndarray): The input image (grayscale).
             bbox (list): The bounding box coordinates [x, y, w, h].
-            threshold (int): The threshold value to determine empty rows. Default is 240.
+            threshold (int): The threshold value to determine empty rows. Default is 205.
             direction (str): The direction to search for empty rows ('top-down' or 'bottom-up'). Default is 'top-down'.
         
         Returns:
@@ -78,18 +78,18 @@ class ImageFunction:
         cropped_img = ImageFunction.cropping_img(gray, best_rect)
         best_rect = ImageFunction.ignore_empty_rows(cropped_img, best_rect)
         best_rect = ImageFunction.ignore_empty_rows(cropped_img, best_rect, direction='bottom-up')
-        cropped_sample = ImageFunction.cropping_img(gray, best_rect)
+        crop_image = ImageFunction.cropping_img(gray, best_rect)
 
         # clahe = cv2.createCLAHE(clipLimit=1.0, tileGridSize=(2, 2))
         clahe = cv2.createCLAHE(clipLimit=2.0, tileGridSize=(8, 8))
         
-        cropped_sample = clahe.apply(cropped_sample)
+        crop_image = clahe.apply(crop_image)
 
         # Ensure 3-channel BGR image
-        if len(cropped_sample.shape) == 2 or (len(cropped_sample.shape) == 3 and cropped_sample.shape[2] == 1):
-            cropped_sample = cv2.cvtColor(cropped_sample, cv2.COLOR_GRAY2BGR)
+        if len(crop_image.shape) == 2 or (len(crop_image.shape) == 3 and crop_image.shape[2] == 1):
+            crop_image = cv2.cvtColor(crop_image, cv2.COLOR_GRAY2BGR)
 
-        return cropped_sample
+        return crop_image
     
     @staticmethod 
     def crop_and_align(img, padding=10):
@@ -136,13 +136,13 @@ class ImageFunction:
         x, y, w, h = cv2.boundingRect(pts)
         x = max(x - padding, 0)
         y = max(y - padding, 0)
-        cropped = rotated[y:y + h + 2 * padding, x:x + w + 2 * padding]
+        crop_image = rotated[y:y + h + 2 * padding, x:x + w + 2 * padding]
 
         # Ensure output is 3-channel BGR
-        if len(cropped.shape) == 2 or cropped.shape[2] == 1:
-            cropped = cv2.cvtColor(cropped, cv2.COLOR_GRAY2BGR)
+        if len(crop_image.shape) == 2 or crop_image.shape[2] == 1:
+            crop_image = cv2.cvtColor(crop_image, cv2.COLOR_GRAY2BGR)
 
-        return cropped
+        return crop_image
     
     @staticmethod
     def save(image, annotated_img, output_dir, output_dir_ori):
