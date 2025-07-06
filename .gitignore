@@ -16,6 +16,7 @@
 Data/
 image/
 weights/
+Data_test/
 # ignore Python cache files
 __pycache__/
 *.py[cod]

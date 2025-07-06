@@ -4,8 +4,9 @@ import cv2
 import numpy as np
 
 class ImageFunction:
+    
     @staticmethod
-    def ignore_empty_rows(img, bbox, threshold=205, direction='top-down'):
+    def ignore_empty_rows(img, bbox, threshold=80, direction='top-down'):
         """
         Find the unimportant rows in the image based on the threshold.
 
@@ -79,7 +80,7 @@ class ImageFunction:
         best_rect = ImageFunction.ignore_empty_rows(cropped_img, best_rect)
         best_rect = ImageFunction.ignore_empty_rows(cropped_img, best_rect, direction='bottom-up')
         crop_image = ImageFunction.cropping_img(gray, best_rect)
-
+        
         # clahe = cv2.createCLAHE(clipLimit=1.0, tileGridSize=(2, 2))
         clahe = cv2.createCLAHE(clipLimit=2.0, tileGridSize=(8, 8))
         
@@ -155,5 +156,61 @@ class ImageFunction:
         
         cv2.imwrite(output_path, annotated_img)
         cv2.imwrite(original_path, image)
-        
+    
         return True
+
+    @staticmethod
+    def crop_image(image, start_point=(1300, 1100), crop_size=(1300, 1300)):
+        # crop_size = (1300, 1300)   # width, height
+        # start_point = (1450, 1050)
+        x, y = start_point
+        w, h = crop_size
+        gray_crop = image[y:y+h, x:x+w]
+        
+        
+        norm_img = cv2.normalize(gray_crop, None, 0, 255, cv2.NORM_MINMAX)
+        blurred = cv2.GaussianBlur(norm_img, (5, 5), 0)
+        # blurred = cv2.GaussianBlur(gray_crop, (5, 5), 0)
+        _, thresh = cv2.threshold(blurred, 90, 255, cv2.THRESH_BINARY_INV)
+        contours, _ = cv2.findContours(thresh, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+
+        max_area = 0
+        best_rect = None
+        for contour in contours:
+            x, y, w, h = cv2.boundingRect(contour)
+            area = w * h
+            if area > max_area and area > 1000:
+                max_area = area
+                best_rect = [x, y, w, h]
+
+        if best_rect is None:
+            raise ValueError("No suitable contour found.")
+
+        cropped_img = ImageFunction.cropping_img(gray_crop, best_rect)
+        best_rect = ImageFunction.ignore_empty_rows(cropped_img, best_rect)
+        # best_rect = ImageFunction.ignore_empty_rows(cropped_img, best_rect, direction='bottom-up')
+        crop_image = ImageFunction.cropping_img(gray_crop, best_rect)
+        
+
+        # clahe = cv2.createCLAHE(clipLimit=1.0, tileGridSize=(2, 2))
+        # clahe = cv2.createCLAHE(clipLimit=2.0, tileGridSize=(8, 8))  
+        # crop_image = clahe.apply(crop_image)
+
+        # Ensure 3-channel BGR image
+        if len(crop_image.shape) == 2 or (len(crop_image.shape) == 3 and crop_image.shape[2] == 1):
+            crop_image = cv2.cvtColor(crop_image, cv2.COLOR_GRAY2BGR)
+
+        return crop_image
+        
+        # Ensure output is 3-channel BGR
+        # if len(crop_image.shape) == 2 or crop_image.shape[2] == 1:
+        #     crop_image = cv2.cvtColor(crop_image, cv2.COLOR_GRAY2BGR)
+
+        # return crop_image
+    @staticmethod
+    def downscale_image(image, levels):
+        for _ in range(levels):
+            image = cv2.pyrDown(image)  # Fixed: cv2 instead of cv
+        return image
+
+    

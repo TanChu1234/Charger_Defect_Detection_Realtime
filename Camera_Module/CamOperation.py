@@ -94,41 +94,36 @@ def Color_numpy(data, nWidth, nHeight):
 class CameraOperation(QObject):
     image_signal = Signal(object)
 
-    def __init__(self, obj_cam, st_device_list, n_connect_num=0, b_open_device=False, b_start_grabbing=False,
-                 h_thread_handle = None, np_arr = None, 
-                 b_thread_closed = False, st_frame_info = None, b_exit=False, b_save_bmp=False,
-                 buf_save_image = None, 
-                 n_save_image_size = 0, frame_rate = 0, exposure_time = 0, gain = 0):
+    def __init__(self, obj_cam, st_device_list, nSelCamIndex=0):
         super().__init__()
         self.obj_cam = obj_cam
         self.st_device_list = st_device_list
-        self.n_connect_num = n_connect_num
-        self.b_open_device = b_open_device
-        self.b_start_grabbing = b_start_grabbing
-        self.b_thread_closed = b_thread_closed
-        self.st_frame_info = st_frame_info
+        self.nSelCamIndex = nSelCamIndex
+        
+        self.b_start_grabbing = False
+        self.b_thread_closed = False
+        self.st_frame_info = None
 
-        self.np_arr = np_arr
-        self.b_exit = b_exit
-        self.b_save_bmp = b_save_bmp
-        self.buf_save_image = buf_save_image
-        self.n_save_image_size = n_save_image_size
+        self.b_open_device = False
+        self.b_exit = False
+        self.b_save_bmp = False
+        self.buf_save_image = None
 
-        self.h_thread_handle = h_thread_handle
+        self.h_thread_handle = None
 
-        self.frame_rate = frame_rate
-        self.exposure_time = exposure_time
-        self.gain = gain
+        self.frame_rate = 0
+        self.exposure_time = 0
+        self.gain = 0
         self.buf_lock = threading.Lock()  # 取图和存图的buffer锁
         self.order = 0
 
     def Open_device(self):
         if not self.b_open_device:
-            if self.n_connect_num < 0:
+            if self.nSelCamIndex < 0:
                 return MV_E_CALLORDER
 
             # ch:选择设备并创建句柄 | en:Select device and create handle
-            nConnectionNum = int(self.n_connect_num)
+            nConnectionNum = int(self.nSelCamIndex)
             stDeviceList = cast(self.st_device_list.pDeviceInfo[int(nConnectionNum)],
                                 POINTER(MV_CC_DEVICE_INFO)).contents
             self.obj_cam = MvCamera()
@@ -236,7 +231,7 @@ class CameraOperation(QObject):
 
         return MV_OK
 
-    def Set_trigger_external(self, trigger_source=0, trigger_activation=0, trigger_delay_us=0):
+    def Set_trigger_external(self, trigger_source, trigger_activation, trigger_delay_us):
         """
         Set the camera to external trigger mode.
         :param trigger_source: 0 for Line0, 1 for Line1, etc.
@@ -271,6 +266,7 @@ class CameraOperation(QObject):
     # Soft trigger once
     def Trigger_once(self):
         self.order +=1
+        # print(self.order)
         if self.b_open_device:
             # self.b_save_bmp = True 
             return self.obj_cam.MV_CC_SetCommandValue("TriggerSoftware")
@@ -307,7 +303,7 @@ class CameraOperation(QObject):
             return MV_E_PARAMETER
         if self.b_open_device:
             ret = self.obj_cam.MV_CC_SetEnumValue("ExposureAuto", 0)
-            time.sleep(0.2)
+            time.sleep(0.01)
             ret = self.obj_cam.MV_CC_SetFloatValue("ExposureTime", float(exposureTime))
             if ret != 0:
                 print('show error', 'set exposure time fail! ret = ' + To_hex_str(ret))
@@ -331,8 +327,7 @@ class CameraOperation(QObject):
         stOutFrame = MV_FRAME_OUT()
         memset(byref(stOutFrame), 0, sizeof(stOutFrame))
         while True:
-            # 200 
-            ret = self.obj_cam.MV_CC_GetImageBuffer(stOutFrame, 200)
+            ret = self.obj_cam.MV_CC_GetImageBuffer(stOutFrame, 10) 
             if 0 == ret:
                 self.order += 1 
                 # Copy images and image information
@@ -342,16 +337,19 @@ class CameraOperation(QObject):
                 # Get cache lock
                 self.buf_lock.acquire()
                 cdll.msvcrt.memcpy(byref(self.buf_save_image), stOutFrame.pBufAddr, self.st_frame_info.nFrameLen)
-                self.np_arr = Mono_numpy(self.buf_save_image, self.st_frame_info.nWidth, self.st_frame_info.nHeight)  
+                np_arr = Mono_numpy(self.buf_save_image, self.st_frame_info.nWidth, self.st_frame_info.nHeight)  
                 self.buf_lock.release()
                 if self.order == 1:
-                    self.image_signal.emit(self.np_arr)
+                    self.image_signal.emit(np_arr)
                     # self.Save_Bmp()
                     # self.b_save_bmp = False  # Reset trigger flag after saving the image
                 # Free cache
+                    # print(self.order)
+
                 self.obj_cam.MV_CC_FreeImageBuffer(stOutFrame)
             else:
                 self.order = 0
+                # print(self.order)
                 # print("no data, ret = " + To_hex_str(ret))
                 continue
 
