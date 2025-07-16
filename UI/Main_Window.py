@@ -247,7 +247,10 @@ class MainWindow(QMainWindow):
         adapter_result, rgb_image = self.adapter_model.detecting(img_np)
         crop_img = self.adapter_model.crop_adapter(adapter_result, rgb_image)
         copy_crop_img = crop_img.copy()
-        img1, defect, qr, sn = self.model_detection.detection(copy_crop_img)
+        copy_crop_img_rotated = cv2.rotate(copy_crop_img, cv2.ROTATE_90_CLOCKWISE)
+        # img1, defect, qr, sn = self.model_detection.detection(copy_crop_img)
+        img1, defect, qr, sn = self.model_detection.detection(copy_crop_img_rotated)
+        
         # crop_img, rgb_image = self.find_pattern.run(img_np)
         # copy_crop_img = crop_img.copy()
         # img1, defect, qr, sn = self.model_detection.detection(rgb_image)

@@ -15,7 +15,7 @@ from pylibdmtx.pylibdmtx import decode
 # }
 
 CATEGORIES = {
-    "defect": ["Text_Defect", "Defect", "QR_Code_Defect", "Logo_Defect"], #, "Qr_Code_Defect"], 
+    "defect": ["Text_Defect", "Defect", "QR_Code_Defect"],
     "qrcode": ["Qr_code"],
     "sn": ["Serial_Number"]
     # "qrcode": ["Logo_Defect"],
@@ -24,7 +24,7 @@ CATEGORIES = {
 
 class DetectionModel:
     def __init__(self):
-        self.model = YOLO('weights/best_yolov12n_train83_scratch_v1.5.pt')
+        self.model = YOLO('weights/best_yolov12n_train110_scratch_v1.6.pt')
         # self.model = YOLO('weights/best_yolov12n_train86_scratch_v1.5.1.pt')        
         self.ocr = PaddleOCR(det=False, rec=True, use_angle_cls=True, lang='en')
         self.test_with_dummy_image()
@@ -185,7 +185,7 @@ class PositionOffset:
     
 class AdapterDetectionModel:
     def __init__(self):
-        self.model = YOLO('weights/best_yolov12n_train84_adapter_0.4.pt')
+        self.model = YOLO('weights/best_yolov12n_train109_adapter_0.7.pt')
         self.test_with_dummy_image()
         
     def test_with_dummy_image(self):
@@ -196,10 +196,10 @@ class AdapterDetectionModel:
     def detecting(self, image):
         raw_image = image.copy()
         rgb_image = cv2.cvtColor(raw_image, cv2.COLOR_GRAY2RGB)
-        
+        # rgb_image_rotated = cv2.rotate(rgb_image, cv2.ROTATE_90_COUNTERCLOCKWISE)
         results = self.model(rgb_image)
         result = results[0]
-
+        # result_rotated = cv2.rotate(rgb_image, cv2.ROTATE_90_COUNTERCLOCKWISE)
         return result, rgb_image
     
     # def crop_adapter(self,image):
@@ -208,25 +208,22 @@ class AdapterDetectionModel:
     def crop_adapter(self, result, image):
         adapter_crop = None
         rgb_image = image.copy()
-        
-        # clahe = cv2.createCLAHE(clipLimit=2.0, tileGridSize=(8, 8))  
-        # rgb_image = clahe.apply(rgb_image)
-        
-        # lab = cv2.cvtColor(rgb_image, cv2.COLOR_BGR2LAB)
-        # l, a, b = cv2.split(lab)
-        # clahe = cv2.createCLAHE(clipLimit=2.0, tileGridSize=(8, 8))
-        # cl = clahe.apply(l)
-        # merged = cv2.merge((cl, a, b))
-        # enhanced_img = cv2.cvtColor(merged, cv2.COLOR_LAB2BGR)
-        # rgb_image = cv2.cvtColor(enhanced_img, cv2.COLOR_BGRA2RGB)
-        
+        height, width = rgb_image.shape[:2]
+        padding = 10
         for box in result.boxes:
             cls_id = int(box.cls[0])
             class_name = result.names[cls_id]
             # conf = box.conf[0]
             if class_name == "Adapter":
                 x1, y1, x2, y2 = map(int, box.xyxy[0])
-                adapter_crop = rgb_image[y1:y2, x1:x2]
+                # Apply padding and clamp to image size
+                x1_p = max(x1 - padding, 0)
+                y1_p = max(y1 - padding, 0)
+                x2_p = min(x2 + padding, width)
+                y2_p = min(y2 + padding, height)
+                
+                # adapter_crop = rgb_image[y1:y2, x1:x2]
+                adapter_crop = rgb_image[y1_p:y2_p, x1_p:x2_p]
                 break    
         return adapter_crop
     

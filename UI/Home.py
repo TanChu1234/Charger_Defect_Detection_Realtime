@@ -260,7 +260,7 @@ class Ui_MainWindow(object):
         self.label_logo.setGeometry(QRect(10, 0, 321, 111))
         self.label_logo.setStyleSheet(u"background-color: none;\n"
 "border:none")
-        self.label_logo.setPixmap(QPixmap(u"image/logo.png"))
+        self.label_logo.setPixmap(QPixmap(u"assets/logo/logo.png"))
         self.label_time = QLabel(self.widget)
         self.label_time.setObjectName(u"label_time")
         self.label_time.setGeometry(QRect(130, 850, 401, 41))
